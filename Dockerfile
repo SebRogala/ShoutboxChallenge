@@ -7,6 +7,7 @@ FROM dunglas/frankenphp:1-php8.3 AS frankenphp_upstream
 # https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
 # https://docs.docker.com/compose/compose-file/#target
 
+ENV NODE_VERSION=20.12.0
 
 # Base FrankenPHP image
 FROM frankenphp_upstream AS frankenphp_base
@@ -65,6 +66,8 @@ RUN set -eux; \
 COPY --link frankenphp/conf.d/app.dev.ini $PHP_INI_DIR/conf.d/
 
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
+
+RUN curl https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz | tar -xz -C /usr/local --strip-components 1
 
 # Prod FrankenPHP image
 FROM frankenphp_base AS frankenphp_prod

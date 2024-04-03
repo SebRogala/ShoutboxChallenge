@@ -27,11 +27,9 @@
         </ul>
     </div>
 
-    <script>
-        const eventSource = new EventSource("{{ mercure('newMessage')|escape('js') }}");
-        eventSource.onmessage = event => {
-            console.log(JSON.parse(event.data));
-        }
-    </script>
-
+    <div class="example-wrapper"
+        {{ react_component('Shoutbox', {
+            mercure: mercure('newMessage')
+        }) }}>
+    </div>
 {% endblock %}
