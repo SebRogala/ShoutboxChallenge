@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AnonUserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -26,12 +28,16 @@ class AnonUser
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'sender')]
+    private Collection $messages;
+
     public function __construct(string $name, string $ip, string $userAgent)
     {
         $this->name = $name;
         $this->ip = $ip;
         $this->userAgent = $userAgent;
         $this->createdAt = new \DateTimeImmutable();
+        $this->messages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -57,5 +63,10 @@ class AnonUser
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getMessages(): Collection
+    {
+        return $this->messages;
     }
 }
