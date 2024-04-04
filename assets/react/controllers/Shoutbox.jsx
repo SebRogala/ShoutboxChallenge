@@ -1,12 +1,14 @@
 import React, {useEffect, useState} from 'react';
 
-export default function ({mercure, sendMessageUrl}) {
+export default function ({mercure, sendMessageUrl, initialMessages}) {
     const [message, setMessage] = useState('');
+    const [messages, setMessages] = useState(initialMessages);
 
     useEffect(() => {
         const es = new EventSource(mercure);
         es.onmessage = event => {
-            console.log(JSON.parse(event.data));
+            const msg = JSON.parse(event.data);
+            setMessages(oldMessages => ([...oldMessages, msg]));
         }
 
         return () => es.close();
@@ -31,6 +33,13 @@ export default function ({mercure, sendMessageUrl}) {
     }
 
     return <>
+        <div className={'messages-container'}>
+            {messages?.map((item) => (
+                <div key={item.id}>
+                    {item.userName}: {item.content}
+                </div>
+            ))}
+        </div>
         <input
             type="text"
             value={message}

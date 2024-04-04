@@ -29,7 +29,19 @@ class MessageRepository extends ServiceEntityRepository
 
     public function keepOnlyNewest(int $maxMessagesNumber)
     {
+    }
 
+    /**
+     * @return Message[]
+     */
+    public function findInitialMessages($limit): array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.deletedAt is NULL')
+            ->orderBy('m.createdAt', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**
