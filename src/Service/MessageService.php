@@ -34,6 +34,8 @@ class MessageService
         $message = new Message($content, Message::TYPE_TEXT, $user);
         $this->messageRepository->save($message);
 
+        $this->messageRepository->keepOnlyNewest($this->maxMessagesToShow);
+
         $this->hub->publish(
             new Update(
                 $this->mercureMessageTopicName,

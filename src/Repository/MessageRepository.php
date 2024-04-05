@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Message;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -27,14 +28,33 @@ class MessageRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function keepOnlyNewest(int $maxMessagesNumber)
+    public function keepOnlyNewest(int $maxMessagesNumber): int
     {
+        $toKeepIds = $this->createQueryBuilder('m2')
+            ->select('m2.id')
+            ->andWhere('m2.deletedAt is NULL')
+            ->orderBy('m2.createdAt', 'DESC')
+            ->setMaxResults($maxMessagesNumber)
+            ->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR_COLUMN)
+        ;
+
+        $queryBuilder = $this->createQueryBuilder('m');
+        $queryBuilder
+            ->update(Message::class, 'm')
+            ->set('m.deletedAt', ':p')
+            ->where($queryBuilder->expr()->notIn('m.id', $toKeepIds))
+            ->andWhere('m.deletedAt is NULL')
+            ->setParameter('p', (new \DateTimeImmutable())->format('Y-m-d H:i:s'))
+        ;
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**
      * @return Message[]
      */
-    public function findInitialMessages($limit): array
+    public function findInitialMessages(int $limit): array
     {
         return $this->createQueryBuilder('m')
             ->andWhere('m.deletedAt is NULL')
@@ -43,29 +63,4 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
-//    /**
-//     * @return Message[] Returns an array of Message objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('m.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Message
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

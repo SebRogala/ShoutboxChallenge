@@ -21,7 +21,8 @@
         {{ react_component('Shoutbox', {
             mercure: mercure(app.request.server.get('MERCURE_MESSAGE_TOPIC_NAME')),
             sendMessageUrl: path('app_new_message'),
-            initialMessages: messages
+            initialMessages: messages,
+            maxMessagesToShow: maxMessagesToShow
         }) }}>
     </div>
 {% endblock %}

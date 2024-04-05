@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Anchorme} from "react-anchorme";
 
-export default function ({mercure, sendMessageUrl, initialMessages}) {
+export default function ({mercure, sendMessageUrl, initialMessages, maxMessagesToShow}) {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState(initialMessages);
 
@@ -9,7 +9,15 @@ export default function ({mercure, sendMessageUrl, initialMessages}) {
         const es = new EventSource(mercure);
         es.onmessage = event => {
             const msg = JSON.parse(event.data);
-            setMessages(oldMessages => ([...oldMessages, msg]));
+            const computeMessages = (oldMessages) => {
+                if (oldMessages.length < maxMessagesToShow) {
+                    return [...oldMessages, msg];
+                }
+
+                return [...oldMessages.slice(1), msg];
+            }
+
+            setMessages(oldMessages => (computeMessages(oldMessages)));
         }
 
         return () => es.close();
