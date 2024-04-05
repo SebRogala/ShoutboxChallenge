@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {Anchorme} from "react-anchorme";
 
 export default function ({mercure, sendMessageUrl, initialMessages}) {
     const [message, setMessage] = useState('');
@@ -36,7 +37,7 @@ export default function ({mercure, sendMessageUrl, initialMessages}) {
         <div className={'messages-container'}>
             {messages?.map((item) => (
                 <div key={item.id}>
-                    {item.userName}: {item.content}
+                    {item.userName}: <Anchorme target="_blank">{item.content}</Anchorme>
                 </div>
             ))}
         </div>
