@@ -1,0 +1,28 @@
+.message-container {
+    display: flex;
+    border-bottom: lightgray solid 1px;
+    flex-direction: column;
+    padding: 5px 0;
+
+    @media screen and (min-width: 650px) {
+        flex-direction: row;
+    }
+}
+
+.message-container__sender {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    padding-bottom: 10px;
+
+    @media screen and (min-width: 650px) {
+        flex-direction: column;
+        min-width: 220px;
+        gap: 0;
+        padding-bottom: 0;
+    }
+}
+
+.message-container:last-child {
+    border-bottom: none;
+}

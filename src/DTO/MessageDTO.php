@@ -12,7 +12,8 @@ class MessageDTO
         public readonly int $id,
         public readonly string $userName,
         public readonly string $type,
-        public readonly string $content
+        public readonly string $content,
+        public readonly \DateTimeImmutable $createdAt
     ) {
     }
 
@@ -22,7 +23,8 @@ class MessageDTO
             $message->getId(),
             $message->getSender()->getName(),
             $message->getType(),
-            $message->getContent()
+            $message->getContent(),
+            $message->getCreatedAt()
         );
     }
 
@@ -34,6 +36,7 @@ class MessageDTO
             'userName' => $this->userName,
             'type' => $this->type,
             'content' => $this->content,
+            'createdAt' => $this->createdAt->format('Y-m-d H:i:s')
         ];
     }
 }

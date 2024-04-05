@@ -1,9 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import {Anchorme} from "react-anchorme";
+import React, {useEffect, useRef, useState} from 'react';
+import Message from "../components/Shoutbox/Message";
+import Inputs from "../components/Shoutbox/Inputs";
 
 export default function ({mercure, sendMessageUrl, initialMessages, maxMessagesToShow}) {
-    const [message, setMessage] = useState('');
     const [messages, setMessages] = useState(initialMessages);
+
+    const messagesEndRef = useRef(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({behavior: "smooth"})
+    }
+
+    useEffect(() => {
+        scrollToBottom()
+    }, [messages]);
 
     useEffect(() => {
         const es = new EventSource(mercure);
@@ -23,38 +33,15 @@ export default function ({mercure, sendMessageUrl, initialMessages, maxMessagesT
         return () => es.close();
     }, []);
 
-    const handleSendMessage = () => {
-        if (message === '') {
-            return;
-        }
-
-        fetch(sendMessageUrl, {
-            method: 'POST',
-            body: JSON.stringify({content: message})
-        })
-            .then(() => setMessage(() => ('')));
-    }
-
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            handleSendMessage();
-        }
-    }
-
     return <>
         <div className={'messages-container'}>
             {messages?.map((item) => (
-                <div key={item.id}>
-                    {item.userName}: <Anchorme target="_blank">{item.content}</Anchorme>
-                </div>
+                <Message message={item} key={item.id}></Message>
             ))}
+            <div ref={messagesEndRef}/>
         </div>
-        <input
-            type="text"
-            value={message}
-            onKeyDown={handleKeyDown}
-            onInput={e => setMessage(e.target.value)}
-        />
-        <button onClick={handleSendMessage}>Send</button>
+        <div className={'inputs-container'}>
+            <Inputs sendMessageUrl={sendMessageUrl}></Inputs>
+        </div>
     </>;
 }
