@@ -51,6 +51,14 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
 			php bin/console doctrine:migrations:migrate --no-interaction
 		fi
+
+		echo 'Setting up test database'
+		if [ -n "$(php bin/console --env=test dbal:run-sql -q "SELECT 1" 2>&1)" ]; then
+			php bin/console --env=test doctrine:database:create
+			php bin/console --env=test doctrine:schema:create
+		else
+			php bin/console --env=test doctrine:schema:update --force
+		fi
 	fi
 
 	setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
