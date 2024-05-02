@@ -3,29 +3,29 @@
 namespace App\Tests\Controller;
 
 use App\Repository\MessageRepository;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\WebTestCase;
 
 class HomeControllerTest extends WebTestCase
 {
     public function testHomepageLoadsWithEmptyInitialMessages(): void
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/');
+        $crawler = $this->client->request('GET', '/');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('div.shoutbox-wrapper');
 
-        self::assertEmpty(json_decode(
-            $crawler->filter('div.shoutbox-wrapper')->attr('data-symfony--ux-react--react-props-value'),
-            true
-        )['initialMessages']);
+        self::assertEmpty(
+            json_decode(
+                $crawler->filter('div.shoutbox-wrapper')->attr('data-symfony--ux-react--react-props-value'),
+                true
+            )['initialMessages']
+        );
     }
 
     public function testItSuccessfullyAddsNewMessage(): void
     {
-        $client = static::createClient();
-        $client->request('POST', '/message', [
-            'content' => 'sample message'
+        $this->client->request('POST', '/message', [
+            'content' => 'sample message',
         ]);
 
         $this->assertResponseIsSuccessful();
