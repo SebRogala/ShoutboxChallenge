@@ -36,13 +36,17 @@ class HomeControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $messageRepository = self::getContainer()->get(MessageRepository::class);
-        $messages = $messageRepository->findInitialMessages(
-            self::getContainer()->getParameter('MAX_MESSAGES_TO_SHOW')
-        );
+        $crawler = $this->client->request('GET', '/');
+        $this->assertResponseIsSuccessful();
+
+        $messages = json_decode(
+            $crawler->filter('div.shoutbox-wrapper')->attr('data-symfony--ux-react--react-props-value'),
+            true
+        )['initialMessages'];
 
         self::assertCount(2, $messages);
-        self::assertSame('http://test.com', $messages[1]->getContent());
+        self::assertStringMatchesFormat("%d-%d-%d %d:%d:%d", $messages[0]['createdAt']);
+        self::assertSame('http://test.com', $messages[1]['content']);
     }
 
     public function testItPreventsEmptyMessageToBeProceeded(): void

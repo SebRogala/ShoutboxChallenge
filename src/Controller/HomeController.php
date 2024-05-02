@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\DTO\DTOHelperTrait;
 use App\Entity\AnonUser;
 use App\Form\NewMessageType;
+use App\Service\DtoSerializer;
 use App\Service\MessageService;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,19 +16,17 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
-    use DTOHelperTrait;
-
     public function __construct(private UserService $userService, private MessageService $messageService)
     {
     }
 
     #[Route('/', name: 'app_home')]
-    public function index(int $maxMessagesToShow): Response
+    public function index(int $maxMessagesToShow, DtoSerializer $serializer): Response
     {
         $messages = $this->messageService->getInitialMessages();
 
         return $this->render('home/index.html.twig', [
-            'messages' => $this->collectionToArray($messages),
+            'messages' => $serializer->toArray($messages),
             'maxMessagesToShow' => $maxMessagesToShow,
         ]);
     }

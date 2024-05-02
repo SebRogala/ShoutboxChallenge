@@ -15,7 +15,8 @@ class MessageService
         private int $maxMessagesToShow,
         private string $mercureMessageTopicName,
         private MessageRepository $messageRepository,
-        private HubInterface $hub
+        private HubInterface $hub,
+        private DtoSerializer $dtoSerializer
     ) {
     }
 
@@ -39,9 +40,7 @@ class MessageService
         $this->hub->publish(
             new Update(
                 $this->mercureMessageTopicName,
-                json_encode(
-                    (MessageDTO::create($message))->toArray()
-                )
+                $this->dtoSerializer->toJson(MessageDTO::create($message))
             )
         );
     }

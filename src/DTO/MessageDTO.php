@@ -27,16 +27,4 @@ class MessageDTO
             $message->getCreatedAt()
         );
     }
-
-
-    public function toArray(): array
-    {
-        return [
-            'id' => $this->id,
-            'userName' => $this->userName,
-            'type' => $this->type,
-            'content' => $this->content,
-            'createdAt' => $this->createdAt->format('Y-m-d H:i:s')
-        ];
-    }
 }
