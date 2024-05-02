@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\DTO\DTOHelperTrait;
 use App\Entity\AnonUser;
+use App\Form\NewMessageType;
 use App\Service\MessageService;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,17 +29,23 @@ class HomeController extends AbstractController
 
         return $this->render('home/index.html.twig', [
             'messages' => $this->collectionToArray($messages),
-            'maxMessagesToShow' => $maxMessagesToShow
+            'maxMessagesToShow' => $maxMessagesToShow,
         ]);
     }
 
     #[Route('/message', name: 'app_new_message', methods: 'POST')]
-    public function newMessage(Request $request): Response
+    public function newMessage(HtmlSanitizerInterface $htmlSanitizer, Request $request): Response
     {
         $user = $this->getAnonUser($request);
-        $content = $request->getPayload()->get('content');
 
-        $this->messageService->handleNewMessage($user, $content);
+        $form = $this->createForm(NewMessageType::class);
+        $form->submit($request->getPayload()->all());
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return new JsonResponse($form->getErrors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $this->messageService->handleNewMessage($user, $form->getData()['content']);
 
         return new JsonResponse('', Response::HTTP_CREATED);
     }

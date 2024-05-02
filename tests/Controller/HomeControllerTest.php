@@ -30,11 +30,48 @@ class HomeControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
 
+        $this->client->request('POST', '/message', [
+            'content' => 'http://test.com',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
         $messageRepository = self::getContainer()->get(MessageRepository::class);
         $messages = $messageRepository->findInitialMessages(
             self::getContainer()->getParameter('MAX_MESSAGES_TO_SHOW')
         );
 
-        self::assertCount(1, $messages);
+        self::assertCount(2, $messages);
+        self::assertSame('http://test.com', $messages[1]->getContent());
+    }
+
+    public function testItPreventsEmptyMessageToBeProceeded(): void
+    {
+        $this->client->request('POST', '/message', [
+            'content' => '',
+        ]);
+
+        $this->assertResponseIsUnprocessable();
+    }
+
+    public function testItSanitizesHtml(): void
+    {
+        $this->client->request('POST', '/message', [
+            'content' => '<script>alert("test");</script>',
+        ]);
+        $this->assertResponseIsUnprocessable();
+
+        $this->client->request('POST', '/message', [
+            'content' => '<script>alert("test");</script>test',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        $messageRepository = self::getContainer()->get(MessageRepository::class);
+        $messages = $messageRepository->findInitialMessages(
+            self::getContainer()->getParameter('MAX_MESSAGES_TO_SHOW')
+        );
+
+        self::assertSame('test', $messages[0]->getContent());
     }
 }
