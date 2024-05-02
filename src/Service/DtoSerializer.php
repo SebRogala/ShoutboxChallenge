@@ -11,17 +11,19 @@ class DtoSerializer
     {
     }
 
-    public function toArray(array $collection): array
+    public function toArray(mixed $object, ?string $groups = null): array
     {
-        return $this->serializer->normalize($collection, null, [
+        return $this->serializer->normalize($object, null, [
             DateTimeNormalizer::FORMAT_KEY => $this->defaultDateTimeFormat,
+            'groups' => $groups,
         ]);
     }
 
-    public function toJson(mixed $object): string
+    public function toJson(mixed $object, ?string $groups = null): string
     {
         return $this->serializer->serialize($object, 'json', [
             DateTimeNormalizer::FORMAT_KEY => $this->defaultDateTimeFormat,
+            'groups' => $groups,
         ]);
     }
 }
