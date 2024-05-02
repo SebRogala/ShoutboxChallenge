@@ -59,6 +59,7 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		else
 			php bin/console --env=test doctrine:schema:update --force
 		fi
+		php bin/console --env=test doctrine:fixtures:load --no-interaction
 	fi
 
 	setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
