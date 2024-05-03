@@ -29,6 +29,13 @@ class HomeControllerTest extends WebTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
+        $crawler = $this->client->request('GET', '/');
+        $messages = json_decode(
+            $crawler->filter('div.shoutbox-wrapper')->attr('data-symfony--ux-react--react-props-value'),
+            true
+        )['initialMessages'];
+        self::assertCount(1, $messages);
+
         $this->client->request('POST', '/message', [
             'content' => 'sample second message',
         ]);

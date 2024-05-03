@@ -28,28 +28,22 @@ class MessageRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function keepOnlyNewest(int $maxMessagesNumber): int
+    public function keepOnlyNewest(int $maxMessagesNumber): void
     {
-        $toKeepIds = $this->createQueryBuilder('m2')
-            ->select('m2.id')
-            ->andWhere('m2.deletedAt is NULL')
-            ->orderBy('m2.createdAt', 'DESC')
-            ->orderBy('m2.id', 'DESC')
-            ->setMaxResults($maxMessagesNumber)
+        //Doing this by ORM instead of DBAL/query to keep Softdeleteable filters work
+        $messagesToDelete = $this->createQueryBuilder('m')
+            ->orderBy('m.createdAt', 'DESC')
+            ->orderBy('m.id', 'DESC')
+            ->setFirstResult($maxMessagesNumber)
             ->getQuery()
-            ->getResult(AbstractQuery::HYDRATE_SCALAR_COLUMN)
-        ;
+            ->getResult();
 
-        $queryBuilder = $this->createQueryBuilder('m');
-        $queryBuilder
-            ->update(Message::class, 'm')
-            ->set('m.deletedAt', ':p')
-            ->where($queryBuilder->expr()->notIn('m.id', $toKeepIds))
-            ->andWhere('m.deletedAt is NULL')
-            ->setParameter('p', (new \DateTimeImmutable())->format('Y-m-d H:i:s'))
-        ;
-
-        return $queryBuilder->getQuery()->getResult();
+        if (!empty($messagesToDelete)) {
+            foreach ($messagesToDelete as $message) {
+                $this->getEntityManager()->remove($message);
+            }
+            $this->getEntityManager()->flush();
+        }
     }
 
     /**
