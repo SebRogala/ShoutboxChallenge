@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\MessageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 class Message
@@ -26,7 +27,8 @@ class Message
     #[ORM\JoinColumn(nullable: false)]
     private ?AnonUser $sender = null;
 
-    #[ORM\Column]
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -37,7 +39,6 @@ class Message
         $this->content = $content;
         $this->type = $type;
         $this->sender = $sender;
-        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

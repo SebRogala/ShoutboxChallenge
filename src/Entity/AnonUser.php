@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: AnonUserRepository::class)]
 class AnonUser
@@ -25,7 +26,8 @@ class AnonUser
     #[ORM\Column(type: Types::TEXT)]
     private ?string $userAgent = null;
 
-    #[ORM\Column]
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'sender')]
@@ -36,7 +38,6 @@ class AnonUser
         $this->name = $name;
         $this->ip = $ip;
         $this->userAgent = $userAgent;
-        $this->createdAt = new \DateTimeImmutable();
         $this->messages = new ArrayCollection();
     }
 

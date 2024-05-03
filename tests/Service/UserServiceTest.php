@@ -41,4 +41,12 @@ class UserServiceTest extends KernelTestCase
 
         self::assertCount(3, $users);
     }
+
+    public function testAnonUserIsTimestampable()
+    {
+        $userService = self::getContainer()->get(UserService::class);
+        $user = $userService->getOrCreateAnonUser('23.0.0.0', 'Console');
+
+        self::assertNotEmpty($user->getCreatedAt());
+    }
 }
