@@ -34,6 +34,7 @@ class MessageRepository extends ServiceEntityRepository
             ->select('m2.id')
             ->andWhere('m2.deletedAt is NULL')
             ->orderBy('m2.createdAt', 'DESC')
+            ->orderBy('m2.id', 'DESC')
             ->setMaxResults($maxMessagesNumber)
             ->getQuery()
             ->getResult(AbstractQuery::HYDRATE_SCALAR_COLUMN)
@@ -54,12 +55,11 @@ class MessageRepository extends ServiceEntityRepository
     /**
      * @return Message[]
      */
-    public function findInitialMessages(int $limit): array
+    public function findInitialMessages(): array
     {
         return $this->createQueryBuilder('m')
-            ->andWhere('m.deletedAt is NULL')
             ->orderBy('m.createdAt', 'ASC')
-            ->setMaxResults($limit)
+            ->orderBy('m.id', 'ASC')
             ->getQuery()
             ->getResult();
     }

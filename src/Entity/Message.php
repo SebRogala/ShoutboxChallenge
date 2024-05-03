@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt')]
 class Message
 {
     const TYPE_TEXT = 'text';
@@ -31,7 +32,7 @@ class Message
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE,nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
     public function __construct(string $content, string $type, AnonUser $sender)

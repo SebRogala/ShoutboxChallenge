@@ -25,16 +25,21 @@ class HomeControllerTest extends WebTestCase
     public function testItSuccessfullyAddsNewMessage(): void
     {
         $this->client->request('POST', '/message', [
-            'content' => 'sample message',
+            'content' => 'sample first message',
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $this->client->request('POST', '/message', [
+            'content' => 'sample second message',
         ]);
 
-        $this->assertResponseIsSuccessful();
+        $this->client->request('POST', '/message', [
+            'content' => 'should be only 2 left',
+        ]);
 
         $this->client->request('POST', '/message', [
             'content' => 'http://test.com',
         ]);
-
-        $this->assertResponseIsSuccessful();
 
         $crawler = $this->client->request('GET', '/');
         $this->assertResponseIsSuccessful();

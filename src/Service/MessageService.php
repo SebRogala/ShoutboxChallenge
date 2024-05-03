@@ -25,7 +25,7 @@ class MessageService
      */
     public function getInitialMessages(): array
     {
-        $result = $this->messageRepository->findInitialMessages($this->maxMessagesToShow);
+        $result = $this->messageRepository->findInitialMessages();
 
         return MessageDTO::createCollection($result);
     }
