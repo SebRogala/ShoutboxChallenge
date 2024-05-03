@@ -1,8 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Message from "../components/Shoutbox/Message";
 import Inputs from "../components/Shoutbox/Inputs";
+import FilePickerInputs from "../components/Shoutbox/FilePickerInputs";
 
-export default function ({mercure, sendMessageUrl, initialMessages, maxMessagesToShow}) {
+export default function ({mercure, fileAssetUri, sendMessageUrl, sendFileUrl, initialMessages, maxMessagesToShow}) {
     const [messages, setMessages] = useState(initialMessages);
 
     const messagesEndRef = useRef(null);
@@ -36,12 +37,13 @@ export default function ({mercure, sendMessageUrl, initialMessages, maxMessagesT
     return <>
         <div className={'messages-container'}>
             {messages?.map((item) => (
-                <Message message={item} key={item.id}></Message>
+                <Message fileAssetUri={fileAssetUri} message={item} key={item.id}></Message>
             ))}
             <div ref={messagesEndRef}/>
         </div>
         <div className={'inputs-container'}>
             <Inputs sendMessageUrl={sendMessageUrl}></Inputs>
+            <FilePickerInputs sendFileUrl={sendFileUrl}></FilePickerInputs>
         </div>
     </>;
 }

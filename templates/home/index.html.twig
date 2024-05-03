@@ -6,7 +6,9 @@
     <div class="shoutbox-wrapper"
         {{ react_component('Shoutbox', {
             mercure: mercure(app.request.server.get('MERCURE_MESSAGE_TOPIC_NAME')),
+            fileAssetUri: asset(app.request.server.get('UPLOAD_DIRECTORY')),
             sendMessageUrl: path('app_new_message'),
+            sendFileUrl: path('app_new_image'),
             initialMessages: messages,
             maxMessagesToShow: maxMessagesToShow
         }) }}>

@@ -43,4 +43,4 @@ services:
 
 
 To watch frontend part:
-1. Run `docker exec -it shoutboxchallenge-php-1 npm watch`
+1. Run `docker exec -it shoutboxchallenge-php-1 npm run watch`

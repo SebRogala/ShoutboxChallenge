@@ -12,12 +12,26 @@
 }
 
 .inputs-container {
-    margin-top: 30px;
     display: flex;
-    gap: 25px;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 30px;
     padding-bottom: 25px;
+
+    @media screen and (min-width: 650px) {
+        flex-direction: row;
+    }
+}
+
+.inputs-container > div {
+    gap: 25px;
+    display: flex;
 }
 
 .inputs-container button {
     width: 100px;
+}
+
+.inputs-container__send-message-wrapper {
+    flex-grow: 1;
 }

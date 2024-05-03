@@ -6,8 +6,10 @@ use App\DTO\MessageDTO;
 use App\Entity\AnonUser;
 use App\Entity\Message;
 use App\Repository\MessageRepository;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class MessageService
 {
@@ -16,7 +18,8 @@ class MessageService
         private string $mercureMessageTopicName,
         private MessageRepository $messageRepository,
         private HubInterface $hub,
-        private DtoSerializer $dtoSerializer
+        private DtoSerializer $dtoSerializer,
+        private SluggerInterface $slugger
     ) {
     }
 
@@ -37,6 +40,27 @@ class MessageService
 
         $this->messageRepository->keepOnlyNewest($this->maxMessagesToShow);
 
+        $this->publishToHub($message);
+    }
+
+    public function handleNewImage(AnonUser $user, UploadedFile $file, string $messageFileUploadDir): void
+    {
+        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFilename = $this->slugger->slug($originalFilename);
+        $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
+
+        $file->move($messageFileUploadDir, $newFilename);
+
+        $message = new Message($newFilename, Message::TYPE_FILE_URI, $user);
+        $this->messageRepository->save($message);
+
+        $this->messageRepository->keepOnlyNewest($this->maxMessagesToShow);
+
+        $this->publishToHub($message);
+    }
+
+    public function publishToHub(Message $message): void
+    {
         $this->hub->publish(
             new Update(
                 $this->mercureMessageTopicName,

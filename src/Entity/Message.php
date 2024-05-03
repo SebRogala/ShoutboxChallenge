@@ -12,6 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class Message
 {
     const TYPE_TEXT = 'text';
+    const TYPE_FILE_URI = 'file_uri';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

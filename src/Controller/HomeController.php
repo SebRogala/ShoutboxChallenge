@@ -3,12 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\AnonUser;
+use App\Form\NewMessageFileType;
 use App\Form\NewMessageType;
 use App\Service\DtoSerializer;
 use App\Service\MessageService;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +32,7 @@ class HomeController extends AbstractController
     }
 
     #[Route('/message', name: 'app_new_message', methods: 'POST')]
-    public function newMessage(HtmlSanitizerInterface $htmlSanitizer, Request $request): Response
+    public function newMessage(Request $request): Response
     {
         $user = $this->getAnonUser($request);
 
@@ -40,10 +40,27 @@ class HomeController extends AbstractController
         $form->submit($request->getPayload()->all());
 
         if (!$form->isSubmitted() || !$form->isValid()) {
-            return new JsonResponse($form->getErrors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+            return new JsonResponse((string)$form->getErrors(true), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $this->messageService->handleNewMessage($user, $form->getData()['content']);
+
+        return new JsonResponse('', Response::HTTP_CREATED);
+    }
+
+    #[Route('/image', name: 'app_new_image', methods: 'POST')]
+    public function newImage(Request $request, string $messageFileUploadDir): Response
+    {
+        $user = $this->getAnonUser($request);
+
+        $form = $this->createForm(NewMessageFileType::class);
+        $form->submit($request->files->all());
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return new JsonResponse((string)$form->getErrors(true), Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $this->messageService->handleNewImage($user, $form->getData()['image'], $messageFileUploadDir);
 
         return new JsonResponse('', Response::HTTP_CREATED);
     }

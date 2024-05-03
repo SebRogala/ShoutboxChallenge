@@ -9,7 +9,7 @@ export default function ({sendMessageUrl}) {
         }
     }
 
-    const handleSendMessage = (msg) => {
+    const handleSendMessage = () => {
         if (message === '') {
             return;
         }
@@ -21,7 +21,7 @@ export default function ({sendMessageUrl}) {
             .then(() => setMessage(() => ('')));
     }
 
-    return <>
+    return <div className={'inputs-container__send-message-wrapper'}>
         <input
             type="text"
             className={'form-control'}
@@ -30,5 +30,5 @@ export default function ({sendMessageUrl}) {
             onInput={e => setMessage(e.target.value)}
         />
         <button className={'btn btn-primary'} onClick={handleSendMessage}>Send</button>
-    </>
+    </div>
 }

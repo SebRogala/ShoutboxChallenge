@@ -23,6 +23,11 @@
     }
 }
 
+.message-container__content img {
+    max-height: 200px;
+    max-width: 400px;
+}
+
 .message-container:last-child {
     border-bottom: none;
 }
